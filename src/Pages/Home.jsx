@@ -1,6 +1,8 @@
 import  { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+const apiUrl = import.meta.env.VITE_API_URL;
+
 export default function Home() {
   const [user, setUser] = useState(null);
   const [tenant, setTenant] = useState(null);
@@ -18,7 +20,7 @@ export default function Home() {
 
     const fetchMeAndNotes = async () => {
       try {
-        const res = await fetch("http://localhost:3000/api/me", {
+        const res = await fetch(`${apiUrl}/api/me`, {
            headers: { 
             "Content-Type": "application/json",
             "Authorization": `Bearer ${token}` 
@@ -30,7 +32,7 @@ export default function Home() {
         setUser(u);
         setTenant(t);
 
-        const notesRes = await fetch("http://localhost:3000/api/notes",
+        const notesRes = await fetch(`${apiUrl}/api/notes`,
            { 
               method: "GET",
               headers: { 
@@ -64,7 +66,7 @@ export default function Home() {
         alert("Description can't be empty");
         return;
       }
-      const res = await fetch("http://localhost:3000/api/notes", {
+      const res = await fetch(`${apiUrl}/api/notes`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify(form),
@@ -88,7 +90,7 @@ export default function Home() {
   const deleteNote = async (id) => {
     if (!confirm("Delete note?")) return;
     try {
-      const res = await fetch(`http://localhost:3000/api/notes/${id}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } });
+      const res = await fetch(`${apiUrl}/api/notes/${id}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } });
       if (!res.ok) throw new Error("Failed");
       setNotes(prev => prev.filter(note => note._id !== id));
     } catch (err) {
@@ -100,7 +102,7 @@ export default function Home() {
     if (!tenant) return;
     if (!confirm("Upgrade tenant to PRO?")) return;
     try {
-      const res = await fetch(`http://localhost:3000/api/tenants/${tenant.slug}/upgrade`, { method: "POST", headers: { Authorization: `Bearer ${token}` } });
+      const res = await fetch(`${apiUrl}/api/tenants/${tenant.slug}/upgrade`, { method: "POST", headers: { Authorization: `Bearer ${token}` } });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Upgrade failed");
       setTenant(data.tenant);
